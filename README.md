@@ -1,5 +1,9 @@
 # AI Engineering Assistant with Jira Integration
 
+**Status: Completed portfolio implementation**
+
+**Status: Completed portfolio implementation**
+
 Portfolio project: a mock-first agent that interprets engineering requests, retrieves project rules, proposes Jira actions, asks for human approval, and executes validated tools against a Jira-like store.
 
 ## Problem and architecture
@@ -119,13 +123,22 @@ System design explanation: the API is the trust boundary; the agent classifies a
 
 Interview questions: How do you prevent prompt injection from reaching tools? How are approvals idempotent? What happens on an invalid transition? How do you evaluate tool selection? How would you swap SQLite for PostgreSQL? Where would retries and rate limits live? How do you redact audit payloads? How would you ground an LLM response in RAG evidence?
 
-## GitHub commands
+## Resume Relevance
+
+Demonstrates FastAPI, Streamlit, Python, Pydantic validation, typed tool boundaries, approval workflows, RAG-style policy retrieval, SQLite/PostgreSQL persistence, audit logging, Docker, and evaluation design.
+
+## Author and Related Work
+
+**Sunil Javadi** · [GitHub](https://github.com/suniljavadi) · [Portfolio](https://github.com/suniljavadi/sunil-portfolio) · [LinkedIn](https://www.linkedin.com/in/sunil-javadi/)
+
+- [AI Agent + Jira Integration](https://github.com/suniljavadi/AI-Agent-Jira-Integration)
+- [Multi-Agent Data Engineering Assistant](https://github.com/suniljavadi/Multi-Agent-AI-Data-Engineering-Assistant)
+- [Data Engineering MCP Server](https://github.com/suniljavadi/data-engineering-mcp-server)
+
+## Local Git Workflow
 
 ```powershell
-git init
 git add .
 git commit -m "Build AI engineering assistant with mock Jira"
-git branch -M main
-git remote add origin https://github.com/<your-user>/ai-jira-agent.git
-git push -u origin main
+git push origin main
 ```
