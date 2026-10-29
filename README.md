@@ -50,6 +50,8 @@ sequenceDiagram
 
 The service has bearer-token-ready authentication, authorization dependency wiring, Pydantic validation, approval IDs, prompt-injection-resistant tool boundaries, audit records, request IDs, and explicit refusal of unsupported destructive requests such as “delete all tickets”. Store secrets in `.env`; never commit them.
 
+The checked-in `.env.example` is for local development only. When `APP_ENV=production`, the service rejects the development token and any API token shorter than 32 characters. Generate a unique token and provide it through the deployment secret manager.
+
 ## Run locally
 
 ```powershell

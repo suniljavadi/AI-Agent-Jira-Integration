@@ -1,9 +1,14 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+import logging
 import time
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
+from starlette.middleware.base import RequestResponseEndpoint
+from starlette.responses import Response
 
 from app.agents.agent import EngineeringAgent
 from app.database.session import get_db, init_db
@@ -13,8 +18,50 @@ from app.models import AuditEvent
 from app.security.auth import require_auth
 from app.tools.jira_tools import JiraTools
 
-app = FastAPI(title="AI Engineering Assistant", version="1.0.0")
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    init_db()
+    yield
+
+
+app = FastAPI(title="AI Engineering Assistant", version="1.0.0", lifespan=lifespan)
 _agent = None
+logger = logging.getLogger(__name__)
+
+
+@app.middleware("http")
+async def log_requests(
+    request: Request,
+    call_next: RequestResponseEndpoint,
+) -> Response:
+    request_id = str(uuid4())
+    started = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        logger.exception(
+            "http_request_failed",
+            extra={
+                "request_id": request_id,
+                "method": request.method,
+                "path": request.url.path,
+            },
+        )
+        raise
+
+    duration_ms = round((time.perf_counter() - started) * 1000, 2)
+    response.headers["X-Request-ID"] = request_id
+    logger.info(
+        "http_request_completed",
+        extra={
+            "request_id": request_id,
+            "method": request.method,
+            "path": request.url.path,
+            "status_code": response.status_code,
+            "duration_ms": duration_ms,
+        },
+    )
+    return response
 
 
 class ChatRequest(BaseModel):
@@ -37,10 +84,6 @@ def get_agent(db: Session) -> EngineeringAgent:
     else:
         _agent.tools = JiraTools(service)
     return _agent
-
-
-@app.on_event("startup")
-def startup() -> None: init_db()
 
 
 @app.get("/health")

@@ -1,6 +1,7 @@
 def test_health(client):
     response = client.get("/health")
     assert response.status_code == 200 and response.json()["mode"] == "mock"
+    assert response.headers["X-Request-ID"]
 
 
 def test_api_crud_and_auth(client):
